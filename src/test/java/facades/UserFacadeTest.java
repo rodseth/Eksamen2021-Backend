@@ -1,11 +1,8 @@
 package facades;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import dto.UserDTO;
 import entities.Role;
 import entities.User;
-import errorhandling.MissingInput;
 import security.errorhandling.AuthenticationException;
 import utils.EMF_Creator;
 
@@ -16,7 +13,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -24,10 +20,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Locale;
-
-import org.hamcrest.MatcherAssert;
-import org.junit.jupiter.api.Disabled;
 
 //Uncomment the line below, to temporarily disable this test
 //@Disabled
@@ -35,8 +27,8 @@ public class UserFacadeTest {
 
     private static EntityManagerFactory emf;
     private static UserFacade facade;
-    private static User user, admin, banned;
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static User user, admin, both;
+
 
     public UserFacadeTest() {
     }
@@ -59,24 +51,22 @@ public class UserFacadeTest {
         EntityManager em = emf.createEntityManager();
         user = new User("user", "test123");
         admin = new User("admin", "test123");
-        banned = new User("banned", "test123");
+        both = new User("user_admin", "test123");
         try {
             em.getTransaction().begin();
             em.createNamedQuery("Roles.deleteAllRows").executeUpdate();
-            em.createNamedQuery("Comment.deleteAllRows").executeUpdate();
-            em.createNamedQuery("Meme.deleteAllRows").executeUpdate();
             em.createNamedQuery("User.deleteAllRows").executeUpdate();
             Role userRole = new Role("user");
             Role adminRole = new Role("admin");
-            Role bannedRole = new Role("banned");
             user.addRole(userRole);
             admin.addRole(adminRole);
-            banned.addRole(bannedRole);
+            both.addRole(userRole);
+            both.addRole(adminRole);
             em.persist(userRole);
             em.persist(adminRole);
             em.persist(user);
             em.persist(admin);
-            em.persist(banned);
+            em.persist(both);
             em.getTransaction().commit();
 
         } finally {
@@ -108,38 +98,16 @@ public class UserFacadeTest {
 
     @Test
     public void testAddUser() throws AuthenticationException {
-
-        String user = "{\"username\":\"Test\",\"password\":\"TestTest\"}";
-        UserDTO userDTO = GSON.fromJson(user, UserDTO.class);
-        UserDTO newUser = facade.addUser(userDTO);
+        User newUser = new User("Test", "Testtest");
+        UserDTO userDTO = facade.addUser(new UserDTO(newUser));
 
         List<UserDTO> userDTOList = facade.getAllUsers();
 
         assertTrue(userDTOList.size() == 4);
 
-        assertTrue(newUser.getUsername().equals(userDTO.getUsername().toLowerCase()));
+        assertTrue(userDTO.getUsername().equals(newUser.getUsername()));
+
     }
-    
-    @Test
-    public void testEditUser() throws MissingInput, AuthenticationException {
-        assertTrue(user.getUsername().equals("user"));
-        user.setProfilePicture("test");
-        facade.editUser(new UserDTO(user));
-        assertTrue(user.getProfilePicture().equals("test"));
-    }
-    
-    @Test
-    public void testBanUser() {
-        assertTrue(user.getUsername().equals("user"));
-        UserDTO userDTO = facade.banUser("user");
-        assertTrue(userDTO.getRoles().get(0).equals("banned"));
-        
-    }
-    
-    @Test
-    public void testUnbanUser() {
-        assertTrue(banned.getUsername().equals("banned"));
-        UserDTO userDTO = facade.unbanUser("banned");
-        assertTrue(userDTO.getRoles().get(0).equals("user"));
-    }
+
 }
+

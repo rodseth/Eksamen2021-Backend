@@ -12,8 +12,7 @@ import org.mindrot.jbcrypt.BCrypt;
 @NamedQuery (name = "User.deleteAllRows", query = "DELETE FROM User")
 @Table(name = "user")
 public class User implements Serializable {
-    
-  private static final String defaultProfilePic = "https://m2bob-forum.net/wcf/images/avatars/3e/2720-3e546be0b0701e0cb670fa2f4fcb053d4f7e1ba5.jpg";
+
 
   private static final long serialVersionUID = 1L;
   @Id
@@ -27,28 +26,11 @@ public class User implements Serializable {
   @Size(min = 1, max = 255)
   @Column(name = "user_pass")
   private String userPass;
-  
   @JoinTable(name = "user_roles", joinColumns = {
-  @JoinColumn(name = "user_name", referencedColumnName = "user_name")}, inverseJoinColumns = {
-  @JoinColumn(name = "role_name", referencedColumnName = "role_name")})
+    @JoinColumn(name = "user_name", referencedColumnName = "user_name")}, inverseJoinColumns = {
+    @JoinColumn(name = "role_name", referencedColumnName = "role_name")})
   @ManyToMany (cascade = CascadeType.PERSIST)
   private List<Role> roleList = new ArrayList<>();
-  
-  @Column(name = "profile_pic")
-  private String profilePicture;
-  
-  @ManyToMany(mappedBy = "upvoters", cascade = CascadeType.PERSIST)
-  private List<Meme> upvotedMemes = new ArrayList<>();
-  
-  @ManyToMany(mappedBy = "downvoters", cascade = CascadeType.PERSIST)
-  private List<Meme> downvotedMemes = new ArrayList<>();
-
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-  private List<Report> reportList = new ArrayList<>();
-
-
-
-
 
   public List<String> getRolesAsStrings() {
     if (roleList.isEmpty()) {
@@ -69,18 +51,10 @@ public class User implements Serializable {
     }
 
   public User(String username, String userPass) {
-    this.username = username.toLowerCase();
+    this.username = username;
     this.userPass = BCrypt.hashpw(userPass, BCrypt.gensalt(12));
-    this.profilePicture = defaultProfilePic;
   }
 
-  public List<Report> getReportList() {
-    return reportList;
-  }
-
-  public void setReportList(List<Report> reportList) {
-    this.reportList = reportList;
-  }
 
   public String getUsername() {
     return username;
@@ -111,29 +85,4 @@ public class User implements Serializable {
     roleList.add(userRole);
   }
 
-    public String getProfilePicture() {
-        return profilePicture;
-    }
-
-    public void setProfilePicture(String profilePicture) {
-        this.profilePicture = profilePicture;
-    }
-
-    public List<Meme> getUpvotedMemes() {
-        return upvotedMemes;
-    }
-
-    public void setUpvotedMemes(List<Meme> upvotedMemes) {
-        this.upvotedMemes = upvotedMemes;
-    }
-
-    public List<Meme> getDownvotedMemes() {
-        return downvotedMemes;
-    }
-
-    public void setDownvotedMemes(List<Meme> downvotedMemes) {
-        this.downvotedMemes = downvotedMemes;
-    }
-    
-    
 }

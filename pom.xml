@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>dat.sem3</groupId>
-    <artifactId>3sem</artifactId>
+    <artifactId>startcode-ca3</artifactId>
     <version>1.0.1</version>
     <packaging>war</packaging>
 
-    <name>3sem-backend</name>
+    <name>startcode-api</name>
 
     <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
@@ -136,7 +136,7 @@
             <!--This is used to enable @BeforeAll etc used in jUnit 5 -->
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.0</version>
+                <version>2.21.0</version>
                 <dependencies>
                     <dependency>
                         <groupId>org.junit.platform</groupId>

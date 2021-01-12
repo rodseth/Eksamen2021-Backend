@@ -1,10 +1,8 @@
 package facades;
 
 import dto.UserDTO;
-import entities.MemeStatus;
 import entities.Role;
 import entities.User;
-import errorhandling.MissingInput;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
@@ -29,22 +27,13 @@ public class UserFacade {
         return instance;
     }
 
-    public UserDTO deleteUser(String username) {
+    public UserDTO deleteUser(String userName) {
 
         EntityManager em = emf.createEntityManager();
-        Query q = em.createQuery("SELECT c FROM Comment c WHERE c.author.username = :name");
-        q.setParameter("name", username);
-        
-        if (q.getResultList().size() > 0) {
-            em.getTransaction().begin();
-            Query del = em.createQuery("DELETE FROM Comment c WHERE c.author.username = :name");
-            del.setParameter("name", username).executeUpdate();
-            em.getTransaction().commit();
-        }
 
         try{
             em.getTransaction().begin();
-            User user = em.find(User.class, username);
+            User user = em.find(User.class, userName);
             em.remove(user);
             em.getTransaction().commit();
 
@@ -65,16 +54,13 @@ public class UserFacade {
             if (user == null || !user.verifyPassword(password)) {
                 throw new AuthenticationException("Invalid user name or password");
             }
-            if(user.getRoleList().get(0).getRoleName().equals("banned")){
-                throw new AuthenticationException("You are banned!");
-            }
         } finally {
             em.close();
         }
         return user;
     }
 
-    public List<UserDTO> getAllUsers() {
+    public List<UserDTO> getAllUsers (){
 
         EntityManager em = emf.createEntityManager();
 
@@ -95,20 +81,13 @@ public class UserFacade {
 
     }
 
-    public UserDTO addUser(UserDTO userDTO) throws  AuthenticationException {
-
-        if(userDTO.getPassword().length() < 4){
-            throw new AuthenticationException("Your password has to be 4 characters or more!");
-        }
-        if(userDTO.getUsername().length() < 2){
-            throw new AuthenticationException("Your username has to be 2 characters or more!");
-        }
+    public UserDTO addUser (UserDTO userDTO) throws  AuthenticationException {
 
         EntityManager em = emf.createEntityManager();
         User user = new User(userDTO.getUsername(), userDTO.getPassword());
         addInitialRoles(em);
         checkRole(user, em);
-        checkIfExists(userDTO, em);
+        checkIfExists(user, em);
         try{
             em.getTransaction().begin();
             em.persist(user);
@@ -119,57 +98,16 @@ public class UserFacade {
             em.close();
         }
     }
-    
-    public UserDTO editUser(UserDTO userDTO) throws MissingInput, AuthenticationException {
-        EntityManager em = emf.createEntityManager();
-        User user = em.find(User.class, userDTO.getUsername());     
-        checkInput(userDTO);
-        user.setProfilePicture(userDTO.getProfilePicture());
-        
-        try {
-            em.getTransaction().begin();
-            em.persist(user);
-            em.getTransaction().commit();
-            return new UserDTO(user);
-        } finally {
-            em.close();
-        }
-    }
-    
-    public void changePassword(UserDTO currentDTO, String newPassword) throws AuthenticationException {
-        EntityManager em = emf.createEntityManager();
-        User currentUser = em.find(User.class, currentDTO.getUsername());
-        
-        if (currentUser.verifyPassword(currentDTO.getPassword())) {
-            currentUser.setUserPass(newPassword);
-            
-            try {
-                em.getTransaction().begin();
-                em.persist(currentUser);
-                em.getTransaction().commit();
-            } finally {
-                em.close();
-            }
-        } else {
-            throw new AuthenticationException("The entered current password is invalid.");
-        }
-    }
 
-    private void checkIfExists(UserDTO userDTO, EntityManager em) throws AuthenticationException {
+    private void checkIfExists(User user, EntityManager em) throws AuthenticationException {
 
         Query query = em.createQuery("SELECT u FROM User u WHERE u.username =:username ");
-        query.setParameter("username", userDTO.getUsername());
+        query.setParameter("username", user.getUsername());
 
        List<User> result = query.getResultList();
         if(result.size() > 0){
             throw new AuthenticationException("A user with this username already exists!");
         }
-    } 
-    
-    private void checkInput(UserDTO userDTO) throws MissingInput {
-        if (userDTO.getProfilePicture().isEmpty()) {
-            throw new MissingInput("All fields must be filled out.");
-        } 
     }
 
     public void checkRole(User user, EntityManager em){
@@ -190,56 +128,8 @@ public class UserFacade {
             em.getTransaction().begin();
             em.persist(new Role("user"));
             em.persist(new Role("admin"));
-            em.persist(new Role("banned"));
-            em.persist(new MemeStatus("OK"));
-            em.persist(new MemeStatus("Reported"));
-            em.persist(new MemeStatus("Blacklisted"));
             em.getTransaction().commit();
         }
     }
-
-    public UserDTO banUser(String username) {
-
-        EntityManager em = emf.createEntityManager();
-
-        User user = em.find(User.class, username);
-
-        Query query = em.createQuery("SELECT r from Role r where r.roleName = 'banned'");
-        Role role = (Role) query.getSingleResult();
-
-        user.getRoleList().clear();
-        user.getRoleList().add(role);
-
-        try{
-            em.getTransaction().begin();
-            em.persist(user);
-            em.getTransaction().commit();
-            }finally {
-            em.close();
-        }
-        return new UserDTO(user);
-    }
-
-    public UserDTO unbanUser(String username) {
-
-        EntityManager em = emf.createEntityManager();
-
-        User user = em.find(User.class, username);
-
-        Query query = em.createQuery("SELECT r from Role r where r.roleName = 'user'");
-        Role role = (Role) query.getSingleResult();
-
-        user.getRoleList().clear();
-        user.getRoleList().add(role);
-
-        try{
-            em.getTransaction().begin();
-            em.persist(user);
-            em.getTransaction().commit();
-        }finally {
-
-            em.close();
-        }
-        return new UserDTO(user);
-    }
+    
 }
