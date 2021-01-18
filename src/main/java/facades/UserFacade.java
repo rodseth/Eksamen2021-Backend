@@ -84,7 +84,7 @@ public class UserFacade {
     public UserDTO addUser (UserDTO userDTO) throws  AuthenticationException {
 
         EntityManager em = emf.createEntityManager();
-        User user = new User(userDTO.getUsername(), userDTO.getPassword());
+        User user = new User(userDTO.getUsername(), userDTO.getPassword(), userDTO.getFirstName(), userDTO.getLastName(), userDTO.getAge(), userDTO.getWeight());
         addInitialRoles(em);
         checkRole(user, em);
         checkIfExists(user, em);

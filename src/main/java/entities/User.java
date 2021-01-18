@@ -29,8 +29,17 @@ public class User implements Serializable {
   @JoinTable(name = "user_roles", joinColumns = {
     @JoinColumn(name = "user_name", referencedColumnName = "user_name")}, inverseJoinColumns = {
     @JoinColumn(name = "role_name", referencedColumnName = "role_name")})
-  @ManyToMany (cascade = CascadeType.PERSIST)
+  @ManyToMany (cascade = CascadeType.PERSIST) 
   private List<Role> roleList = new ArrayList<>();
+  
+  private String firstName;
+  private String lastName;
+  private int age;
+  private double weight;
+ //   @OneToMany(mappedBy = "user")
+ // private List<Activity> activities;
+  
+         
 
   public List<String> getRolesAsStrings() {
     if (roleList.isEmpty()) {
@@ -54,6 +63,17 @@ public class User implements Serializable {
     this.username = username;
     this.userPass = BCrypt.hashpw(userPass, BCrypt.gensalt(12));
   }
+
+    public User(String username, String userPass, String firstName, String lastName, int age, double weight) {
+        this.username = username;
+        this.userPass = BCrypt.hashpw(userPass, BCrypt.gensalt(12));
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.age = age;
+        this.weight = weight;
+    }
+  
+  
 
 
   public String getUsername() {
@@ -80,6 +100,40 @@ public class User implements Serializable {
   public void setRoleList(List<Role> roleList) {
     this.roleList = roleList;
   }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public double getWeight() {
+        return weight;
+    }
+
+    public void setWeight(double weight) {
+        this.weight = weight;
+    }
+  
+  
 
   public void addRole(Role userRole) {
     roleList.add(userRole);
