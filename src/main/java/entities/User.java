@@ -36,8 +36,10 @@ public class User implements Serializable {
   private String lastName;
   private int age;
   private double weight;
- //   @OneToMany(mappedBy = "user")
- // private List<Activity> activities;
+    @OneToMany(mappedBy = "user")
+  private List<Activity> activitys;
+
+
   
          
 
@@ -53,6 +55,11 @@ public class User implements Serializable {
   }
 
   public User() {}
+  
+  public User(String username) {
+        this.username = username;
+    }
+  
 
    public boolean verifyPassword(String pw){
        boolean matches = BCrypt.checkpw(pw, this.userPass);
@@ -132,11 +139,34 @@ public class User implements Serializable {
     public void setWeight(double weight) {
         this.weight = weight;
     }
+
+    public List<Activity> getActivitys() {
+        return activitys;
+    }
+
+    public void setActivitys(List<Activity> activitys) {
+        this.activitys = activitys;
+    }
+    
+    public void setActivitys(Activity a) {
+        if(this.activitys == null){
+            
+         this.activitys = new ArrayList<>();
+    }
+        
+    this.activitys.add(a);
+    a.setUser(this);
+    }
+    
   
   
 
   public void addRole(Role userRole) {
     roleList.add(userRole);
+  }
+  
+  public void addActivity (Activity activity) {
+      activitys.add(activity);
   }
 
 }

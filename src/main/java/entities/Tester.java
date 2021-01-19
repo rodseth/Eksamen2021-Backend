@@ -1,4 +1,5 @@
 package entities;
+import facades.ActivityFacade;
 import facades.UserFacade;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -12,6 +13,14 @@ public class Tester {
         EntityManager em = emf.createEntityManager();
        
         UserFacade UF = UserFacade.getUserFacade(emf);
+        
+        ActivityFacade AF = ActivityFacade.getActivityFacade(emf);
+        
+        ExerciseType e1 = new ExerciseType("jogging");
+        User u1 = new User("mariH", "1234", "Mari", "Haugen", 35, 75);
+        Activity a1 = new Activity("12-02-2021", 45, 4, "middels intensitet");
+        
+       //AF.addActivity(a1, u1, e1);
         
       
         

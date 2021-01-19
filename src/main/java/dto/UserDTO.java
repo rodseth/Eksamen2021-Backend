@@ -15,7 +15,7 @@ public class UserDTO {
     private String lastName;
     private int age;
     private double weight;
-    //private List<Activity> activities;
+    private List<Activity> activities;
 
 
     public UserDTO(User user) {
@@ -25,6 +25,8 @@ public class UserDTO {
         this.lastName = user.getLastName();
         this.age = user.getAge();
         this.weight = user.getWeight();
+        this.activities = user.getActivitys();
+      
     }
     
     
@@ -87,6 +89,16 @@ public class UserDTO {
     public void setWeight(double weight) {
         this.weight = weight;
     }
+
+    public List<Activity> getActivities() {
+        return activities;
+    }
+
+    public void setActivities(List<Activity> activities) {
+        this.activities = activities;
+    }
+    
+    
     
     
 }
