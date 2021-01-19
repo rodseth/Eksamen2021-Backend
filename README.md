@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/rodseth/Eksamen2021-Backend.svg?branch=master]
+[![Build Status](https://travis-ci.com/rodseth/Eksamen2021-Backend.svg?branch=master)](https://travis-ci.com/rodseth/Eksamen2021-Backend)
 # BornIT (Group 8) backend startcode
 
 Our backend startcode comes complete with a fully functional login system (that uses JWT), with User and Role entity classes, a UserFacade containing various methods such as addUser and deleteUser, along with a resource class with corresponding endpoints.  It also contains an Example resource and the ExampleFetcher class, which by default fetches data from five different endpoints (and can be used as a template for similar operations), which can then be displayed on the frontend startcode. 
